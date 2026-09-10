@@ -2,8 +2,11 @@ name: Forecast on Metaculus Cup
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 */2 * *" # runs at midnight every 2 days
+  # Auto-start is intentionally DISABLED for the initial public push so that
+  # publishing the repo cannot start posting real forecasts. Re-enable only as a
+  # deliberate, authorized step (see FORECASTFORGE_SETUP.md).
+  # schedule:
+  #   - cron: "0 0 */2 * *" # runs at midnight every 2 days
 
 # Add concurrency group to prevent parallel runs
 concurrency:
