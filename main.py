@@ -679,9 +679,11 @@ if __name__ == "__main__":
     # `researcher` is the one real change: the auto-selected
     # `openrouter/openai/gpt-4o-search-preview` is not served by OpenRouter
     # ("No endpoints found", HTTP 404), so research always failed. It is
-    # replaced with Perplexity Sonar Pro, a live-web-search model available on
-    # OpenRouter (and the same model forecasting-tools picks when a direct
-    # PERPLEXITY_API_KEY is present). This keeps current-information research.
+    # replaced with `openrouter/openai/gpt-4o:online` — the base model/provider
+    # stays OpenAI (allowed by the funded key), and OpenRouter's `:online`
+    # suffix adds a live web-search step. This keeps current-information
+    # research without routing through a provider the funded key blocks
+    # (Perplexity is blocked by this key's provider allowlist).
     template_bot = SummerTemplateBot2026(
         research_reports_per_question=1,
         predictions_per_research_report=5,
@@ -698,7 +700,7 @@ if __name__ == "__main__":
                 model="openrouter/openai/gpt-4o-mini", temperature=0.3
             ),
             "researcher": GeneralLlm(
-                model="openrouter/perplexity/sonar-pro", temperature=0.1
+                model="openrouter/openai/gpt-4o:online", temperature=0.1
             ),
             "parser": GeneralLlm(
                 model="openrouter/openai/gpt-4o-mini", temperature=0.3
