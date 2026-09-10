@@ -3,10 +3,10 @@ name: Forecast on new AI tournament questions
 
 on:
   workflow_dispatch:
-  # Production auto-start is intentionally DISABLED for the initial public push.
-  # Re-enable only as a deliberate, authorized step (see FORECASTFORGE_SETUP.md).
-  # schedule:
-  #   - cron: "7,27,47 * * * *" # every 20 min, offset off the hour. Make sure to skip already-forecasted questions!
+  # Production schedule ACTIVATED 2026-09-11 (authorized). Targets MiniBench now;
+  # Fall 2026 FutureEval auto-adds on/after 2026-09-28 via the date gate in main.py.
+  schedule:
+    - cron: "7,27,47 * * * *" # every 20 min, offset off the hour. Make sure to skip already-forecasted questions!
 
 # Add concurrency group to prevent parallel runs
 concurrency:
