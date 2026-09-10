@@ -3,10 +3,11 @@ name: Forecast on new AI tournament questions
 
 on:
   workflow_dispatch:
-  # Production schedule ACTIVATED 2026-09-11 (authorized). Targets MiniBench now;
-  # Fall 2026 FutureEval auto-adds on/after 2026-09-28 via the date gate in main.py.
   schedule:
-    - cron: "7,27,47 * * * *" # every 20 min, offset off the hour. Make sure to skip already-forecasted questions!
+    # Production schedule (authorized 2026-09-11). Every 20 min, offset off the
+    # hour; the bot skips already-forecasted questions. Targets MiniBench now;
+    # Fall 2026 FutureEval auto-adds on/after 2026-09-28 via the date gate in main.py.
+    - cron: "7,27,47 * * * *"
 
 # Add concurrency group to prevent parallel runs
 concurrency:
