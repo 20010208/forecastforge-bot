@@ -107,10 +107,13 @@ Implications for ForecastForge-bot:
 - **Set only `OPENROUTER_API_KEY` (funded) + `METACULUS_TOKEN`.**
 - **`main.py` now pins `llms={}` explicitly** (all four `openrouter/*` slugs):
   `default`/`summarizer`/`parser` = `openrouter/openai/gpt-4o` + `...gpt-4o-mini`,
-  `researcher` = `openrouter/perplexity/sonar-pro`. This was done because the auto-selected
+  `researcher` = `openrouter/openai/gpt-4o:online`. This was done because the auto-selected
   researcher `openrouter/openai/gpt-4o-search-preview` is **not served by OpenRouter**
-  (HTTP 404 "No endpoints found") and broke every research step. Pinning also makes the
-  funded-key routing explicit and immune to future `_llm_config_defaults` changes.
+  (HTTP 404 "No endpoints found") and broke every research step. Perplexity Sonar was tried
+  next but is **blocked by the funded key's provider allowlist** (openai / anthropic /
+  google-ai-studio only), so the researcher uses the OpenAI base model plus OpenRouter's
+  `:online` web-search suffix — provider stays OpenAI, live research retained. Pinning also
+  makes the funded-key routing explicit and immune to future `_llm_config_defaults` changes.
 - **If `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` were set, they would silently take priority**
   over the funded key and bill your personal account. That is the one and only personal-billing
   path — and it only exists if you create those secrets. Don't.
