@@ -667,9 +667,21 @@ if __name__ == "__main__":
     publish_to_metaculus = True
     print_startup_banner(run_mode, will_publish=publish_to_metaculus)
 
-    # Configure the bot. The `llms=` block below is commented out to use
-    # whichever default models forecasting-tools picks based on your env vars;
-    # uncomment and edit to pin specific models.
+    # ForecastForge-bot: every model is pinned to an explicit `openrouter/...`
+    # slug so all spend goes through the Metaculus-funded OPENROUTER_API_KEY and
+    # nothing else. Do NOT set OPENAI_API_KEY / ANTHROPIC_API_KEY — see
+    # FORECASTFORGE_SETUP.md section 5.
+    #
+    # `default` / `summarizer` / `parser` are exactly what forecasting-tools'
+    # _llm_config_defaults() already resolves to for an OpenRouter-only setup;
+    # they are pinned here only to make the routing explicit and stable.
+    #
+    # `researcher` is the one real change: the auto-selected
+    # `openrouter/openai/gpt-4o-search-preview` is not served by OpenRouter
+    # ("No endpoints found", HTTP 404), so research always failed. It is
+    # replaced with Perplexity Sonar Pro, a live-web-search model available on
+    # OpenRouter (and the same model forecasting-tools picks when a direct
+    # PERPLEXITY_API_KEY is present). This keeps current-information research.
     template_bot = SummerTemplateBot2026(
         research_reports_per_question=1,
         predictions_per_research_report=5,
@@ -678,17 +690,20 @@ if __name__ == "__main__":
         folder_to_save_reports_to=None,
         skip_previously_forecasted_questions=True,
         extra_metadata_in_explanation=True,
-        # llms={
-        #     "default": GeneralLlm(
-        #         model="openrouter/openai/gpt-4o",
-        #         temperature=0.3,
-        #         timeout=40,
-        #         allowed_tries=2,
-        #     ),
-        #     "summarizer": "openai/gpt-4o-mini",
-        #     "researcher": "asknews/news-summaries",
-        #     "parser": "openai/gpt-4o-mini",
-        # },
+        llms={
+            "default": GeneralLlm(
+                model="openrouter/openai/gpt-4o", temperature=0.3
+            ),
+            "summarizer": GeneralLlm(
+                model="openrouter/openai/gpt-4o-mini", temperature=0.3
+            ),
+            "researcher": GeneralLlm(
+                model="openrouter/perplexity/sonar-pro", temperature=0.1
+            ),
+            "parser": GeneralLlm(
+                model="openrouter/openai/gpt-4o-mini", temperature=0.3
+            ),
+        },
     )
 
     # Per-mode tournament URL shown in the summary banner footer. These
