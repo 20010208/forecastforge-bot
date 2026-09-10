@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "metac-bot-template"
+name = "forecastforge-bot"
 version = "0.1.0"
-description = ""
-authors = ["Vasile Popescu <elisescu@elisescu.com>"]
+description = "ForecastForge-bot - Metaculus forecasting bot based on the official metac-bot-template"
+authors = ["ForecastForge-bot maintainer"]
 readme = "README.md"
 package-mode = false
 
