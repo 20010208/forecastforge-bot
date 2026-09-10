@@ -2,6 +2,10 @@
 benchmarks/
 sandbox.py
 
+# Local-only Claude Code bootstrap that points at the private forecastforge-memory
+# repo. Never commit this to the public repo.
+CLAUDE.local.md
+
 
 ### General gitignore ###
 
