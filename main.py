@@ -712,7 +712,7 @@ if __name__ == "__main__":
     # piggyback on the forecasting_tools SDK constants and need updating
     # whenever those rotate seasons.
     TOURNAMENT_URLS = {
-        "tournament": "https://www.metaculus.com/tournament/summer-futureeval-2026/",
+        "tournament": "https://www.metaculus.com/tournament/fall-futureeval-2026/",
         "metaculus_cup": "https://www.metaculus.com/tournament/metaculus-cup-summer-2025/",
         "test_questions": "https://www.metaculus.com/tournament/bot-testing-area/",
     }
@@ -722,17 +722,33 @@ if __name__ == "__main__":
     # summary printers below.
     client = MetaculusClient()
     if run_mode == "tournament":
-        seasonal_tournament_reports = asyncio.run(
-            template_bot.forecast_on_tournament(
-                client.CURRENT_AI_COMPETITION_ID, return_exceptions=True
+        # ForecastForge production targets.
+        #
+        # Summer 2026 FutureEval closed for forecasting on 2026-09-06 — removed
+        # (the installed forecasting-tools still points CURRENT_AI_COMPETITION_ID
+        # at it, so we no longer use that constant here).
+        #
+        # Fall 2026 FutureEval (id 33121, slug fall-futureeval-2026) opens
+        # 2026-09-28. Before that date it only contains a [PRACTICE] question,
+        # so a date gate keeps it out of the target list until then — otherwise
+        # the first production run would spend funded credit and post a forecast
+        # on that practice question. On/after 2026-09-28 the gate adds Fall
+        # automatically; no manual edit is required on the 28th.
+        #
+        # MiniBench is always targeted; it simply returns nothing when the
+        # current round has no open questions.
+        FE_FALL_2026_ID = 33121  # https://www.metaculus.com/tournament/fall-futureeval-2026/
+        FE_FALL_2026_START = datetime(2026, 9, 28, tzinfo=timezone.utc)
+
+        tournament_targets: list[int | str] = [client.CURRENT_MINIBENCH_ID]
+        if datetime.now(timezone.utc) >= FE_FALL_2026_START:
+            tournament_targets.append(FE_FALL_2026_ID)
+
+        forecast_reports = []
+        for target in tournament_targets:
+            forecast_reports += asyncio.run(
+                template_bot.forecast_on_tournament(target, return_exceptions=True)
             )
-        )
-        minibench_reports = asyncio.run(
-            template_bot.forecast_on_tournament(
-                client.CURRENT_MINIBENCH_ID, return_exceptions=True
-            )
-        )
-        forecast_reports = seasonal_tournament_reports + minibench_reports
     elif run_mode == "metaculus_cup":
         # The Metaculus Cup may be uninitialized near the start of a season
         # (Jan/May/Sep). AXC_2025_TOURNAMENT_ID = 32564 and

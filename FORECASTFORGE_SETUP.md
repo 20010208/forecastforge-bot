@@ -23,7 +23,7 @@ framework. It has three run modes:
 | Mode | Command | Target | Posts to Metaculus? |
 |------|---------|--------|---------------------|
 | `test_questions` | `poetry run python main.py --mode test_questions` | [bot-testing-area](https://www.metaculus.com/tournament/bot-testing-area/) (non-scored sandbox) | **Yes** (to the sandbox) |
-| `tournament` (default) | `poetry run python main.py` | Summer FutureEval 2026 **+ MiniBench** | **Yes** (real tournament) |
+| `tournament` (default) | `poetry run python main.py` | MiniBench now; **Fall 2026 FutureEval** (`33121`, `fall-futureeval-2026`) auto-added on/after 2026-09-28 via a date gate in `main.py`. Summer 2026 FutureEval was removed (closed 2026-09-06). | **Yes** (real tournament) |
 | `metaculus_cup` | `poetry run python main.py --mode metaculus_cup` | Metaculus Cup | **Yes** (real) |
 
 `publish_reports_to_metaculus=True` is hard-coded near the bottom of `main.py`
@@ -198,9 +198,15 @@ LLM credits to generate the forecast, just doesn't upload it).
 The workflow **`.github/workflows/run_bot_on_tournament.yaml`** is the one that forecasts on
 **FutureEval + MiniBench**:
 
-- Runs `poetry run python main.py` (default `tournament` mode → `CURRENT_AI_COMPETITION_ID`
-  + `CURRENT_MINIBENCH_ID`).
-- Schedule: `cron: "7,27,47 * * * *"` — every 20 minutes. Skips questions already forecast.
+- Runs `poetry run python main.py` (default `tournament` mode). Targets: **MiniBench**
+  always, plus **Fall 2026 FutureEval** (`33121`) once `datetime.now(UTC) >= 2026-09-28`
+  — the date gate in `main.py` adds it automatically, no manual edit needed. Summer 2026
+  FutureEval (`33022`) was removed (closed 2026-09-06). Before 2026-09-28, Fall is skipped
+  because it only holds a `[PRACTICE]` question.
+- Schedule: `cron: "7,27,47 * * * *"` — every 20 minutes (**currently commented out**;
+  restore it to activate production). Skips questions already forecast.
+- After 2026-09-28, confirm from an Actions run log that Fall 2026 questions are being
+  picked up (the run summary lists each forecast's tournament URL).
 - On GitHub it is **enabled the moment Actions is enabled on the repo.** To keep it off
   until you're ready: after pushing, go to
   `Actions → Forecast on new AI tournament questions → ··· → Disable workflow`, or delete the
