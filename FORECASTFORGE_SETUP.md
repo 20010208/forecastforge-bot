@@ -104,9 +104,13 @@ OPENAI_API_KEY  >  ANTHROPIC_API_KEY  >  OPENROUTER_API_KEY  >  METACULUS_TOKEN 
 
 Implications for ForecastForge-bot:
 
-- **Set only `OPENROUTER_API_KEY` (funded) + `METACULUS_TOKEN`.** Then every model call
-  (`default`, `summarizer`, `parser`, `researcher`) routes through the funded OpenRouter key
-  as `openrouter/openai/gpt-4o` / `...gpt-4o-mini` / `...gpt-4o-search-preview`.
+- **Set only `OPENROUTER_API_KEY` (funded) + `METACULUS_TOKEN`.**
+- **`main.py` now pins `llms={}` explicitly** (all four `openrouter/*` slugs):
+  `default`/`summarizer`/`parser` = `openrouter/openai/gpt-4o` + `...gpt-4o-mini`,
+  `researcher` = `openrouter/perplexity/sonar-pro`. This was done because the auto-selected
+  researcher `openrouter/openai/gpt-4o-search-preview` is **not served by OpenRouter**
+  (HTTP 404 "No endpoints found") and broke every research step. Pinning also makes the
+  funded-key routing explicit and immune to future `_llm_config_defaults` changes.
 - **If `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` were set, they would silently take priority**
   over the funded key and bill your personal account. That is the one and only personal-billing
   path — and it only exists if you create those secrets. Don't.
@@ -122,10 +126,9 @@ Implications for ForecastForge-bot:
   "not set"** — so simply never creating those secrets is sufficient and safe. The workflow
   files are left unchanged from upstream.
 
-No `main.py` change is required to enforce this — it is purely a matter of **which secrets
-you create**. (Optional hardening, not done here: pin `llms={...}` to explicit
-`openrouter/...` models in `main.py`, and/or delete the unused `*_API_KEY` lines from the
-workflow `env:` blocks.)
+Beyond the explicit `llms={}` pin above, enforcement is purely a matter of **which secrets
+you create**. (Further optional hardening, not done: delete the unused `*_API_KEY` lines
+from the workflow `env:` blocks.)
 
 ---
 
