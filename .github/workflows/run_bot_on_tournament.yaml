@@ -3,11 +3,13 @@ name: Forecast on new AI tournament questions
 
 on:
   workflow_dispatch:
-  schedule:
-    # Production schedule (authorized 2026-09-11). Every 20 min, offset off the
-    # hour; the bot skips already-forecasted questions. Targets MiniBench now;
-    # Fall 2026 FutureEval auto-adds on/after 2026-09-28 via the date gate in main.py.
-    - cron: "7,27,47 * * * *"
+  # Native GitHub schedule DISABLED after Cloudflare cutover (authorized 2026-09-14).
+  # The Cloudflare Worker in forecastforge-dispatcher is now the sole automatic
+  # scheduler (cron 17,37,57 * * * *, verified end-to-end via run 34791148195).
+  # workflow_dispatch above stays enabled so the Cloudflare Worker (and manual
+  # runs) can still trigger this workflow.
+  # schedule:
+  #   - cron: "7,27,47 * * * *" # every 20 min, offset off the hour. Make sure to skip already-forecasted questions!
 
 # Add concurrency group to prevent parallel runs
 concurrency:
